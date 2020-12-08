@@ -16,7 +16,6 @@ namespace :deploy do
     desc "Remove all local precompiled assets"
     task :cleanup do
       run_locally do
-        execute "rm", "-rf", fetch(:assets_dir)
         execute "rm", "-rf", fetch(:packs_dir)
       end
     end
@@ -26,8 +25,8 @@ namespace :deploy do
       run_locally do
         precompile_env = fetch(:precompile_env) || fetch(:rails_env) || 'production'
         with rails_env: precompile_env do
-          execute "rake", "assets:clean"
-          execute "rake", "assets:precompile"
+          execute "rake", "webpacker:clean"
+          execute "rake", "webpacker:compile"
         end
       end
     end
@@ -39,7 +38,6 @@ namespace :deploy do
           remote_shell = %(-e "ssh -p #{server.port}") if server.port
 
           commands = []
-          commands << "#{fetch(:rsync_cmd)} #{remote_shell} ./#{fetch(:assets_dir)}/ #{server.user}@#{server.hostname}:#{release_path}/#{fetch(:assets_dir)}/" if Dir.exists?(fetch(:assets_dir))
           commands << "#{fetch(:rsync_cmd)} #{remote_shell} ./#{fetch(:packs_dir)}/ #{server.user}@#{server.hostname}:#{release_path}/#{fetch(:packs_dir)}/" if Dir.exists?(fetch(:packs_dir))
 
           commands.each do |command| 
