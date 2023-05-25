@@ -1,7 +1,7 @@
 namespace :load do
   task :defaults do
     set :assets_dir,       "public/assets"
-    set :packs_dir,        "public/packs"
+    set :packs_dir,        "public/packsx"
     set :rsync_cmd,        "rsync -av --delete"
     set :assets_role,      "web"
 
@@ -16,7 +16,7 @@ namespace :deploy do
     desc "Remove all local precompiled assets"
     task :cleanup do
       run_locally do
-        execute "rm", "-rf", fetch(:packs_dir)
+        execute "rm", "-rf", "#{fetch(:packs_dir)}/*"
       end
     end
 
@@ -26,6 +26,7 @@ namespace :deploy do
         precompile_env = fetch(:precompile_env) || fetch(:rails_env) || 'production'
         with rails_env: precompile_env do
           execute "rake", "webpacker:clean"
+          execute "rm", "-rf", "#{fetch(:packs_dir)}/*"
           execute "rake", "webpacker:compile"
         end
       end
