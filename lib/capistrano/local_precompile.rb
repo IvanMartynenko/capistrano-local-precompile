@@ -1,7 +1,7 @@
 namespace :load do
   task :defaults do
     set :assets_dir,       'public/assets'
-    set :packs_dir,        'public/packsx'
+    set :packs_dir,        'public/packs'
     set :rsync_cmd,        'rsync -av --delete'
     set :assets_role,      'web'
 
@@ -40,15 +40,14 @@ namespace :deploy do
 
           packs_dir = fetch(:packs_dir)
           remount_path = "#{server.user}@#{server.hostname}:#{current_path}/#{packs_dir}/"
-          command = Dir.exist?(packs_dir) ? "#{fetch(:rsync_cmd)} #{remote_shell} ./packs_dir/ #{remount_path}" : nil
+          command = Dir.exist?(packs_dir) ? "#{fetch(:rsync_cmd)} #{remote_shell} ./#{packs_dir}/ #{remount_path}" : nil
           return if command.nil?
 
           if dry_run?
             SSHKit.config.output.info command
-            return
+          else
+            execute command
           end
-
-          execute command
         end
       end
     end
